@@ -2,8 +2,6 @@
 // Created by raysh on 9/16/2025.
 //
 
-#pragma once
-
 #include <first_app.h>
 #include <cstdlib>
 #include <iostream>

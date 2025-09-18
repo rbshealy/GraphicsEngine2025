@@ -5,6 +5,7 @@
 #pragma once
 
 #include <game_window.h>
+#include <game_pipeline.h>
 
 namespace GEngine {
 
@@ -17,6 +18,7 @@ namespace GEngine {
       void run();
       private:
         GameWindow GameWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
+        GamePipeline GamePipeline{"shaders/simple_shader.vert.spv", "shaders/simple_shader.frag.spv"};
 
       };
 }

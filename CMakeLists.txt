@@ -7,6 +7,42 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(GLOB PROJECT_SRC CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
 add_executable(app ${PROJECT_SRC})
 
+find_program(GLSLC_EXECUTABLE NAMES glslc
+        HINTS "$ENV{VULKAN_SDK}/Bin"
+)
+
+if (NOT GLSLC_EXECUTABLE)
+    message(FATAL_ERROR "glslc not found! Make sure VULKAN_SDK and PATH are set.")
+endif()
+
+message(STATUS "Found glslc: ${GLSLC_EXECUTABLE}")
+
+set(SHADER_DIR ${CMAKE_SOURCE_DIR}/shaders)
+
+set(SHADERS
+        ${SHADER_DIR}/simple_shader.vert
+        ${SHADER_DIR}/simple_shader.frag
+)
+
+set(SPIRV_OUTPUT_DIR ${CMAKE_BINARY_DIR}/shaders)
+
+foreach(SHADER ${SHADERS})
+    get_filename_component(FILE_NAME ${SHADER} NAME)
+    set(SPIRV_FILE ${SPIRV_OUTPUT_DIR}/${FILE_NAME}.spv)
+
+    add_custom_command(
+            OUTPUT ${SPIRV_FILE}
+            COMMAND ${GLSLC_EXECUTABLE} ${SHADER} -o ${SPIRV_FILE}
+            DEPENDS ${SHADER}
+            COMMENT "Compiling shader ${FILE_NAME} -> ${SPIRV_FILE}"
+    )
+    list(APPEND SPIRV_BINARY_FILES ${SPIRV_FILE})
+endforeach()
+
+add_custom_target(compile_shaders ALL DEPENDS ${SPIRV_BINARY_FILES})
+
+add_dependencies(app compile_shaders)
+
 target_include_directories(app PRIVATE ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/external/glm
 )
