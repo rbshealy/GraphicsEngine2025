@@ -6,6 +6,7 @@
 
 #include <game_window.h>
 #include <game_pipeline.h>
+#include <game_device.h>
 
 namespace GEngine {
 
@@ -18,7 +19,9 @@ namespace GEngine {
       void run();
       private:
         GameWindow GameWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
-        GamePipeline GamePipeline{"shaders/simple_shader.vert.spv", "shaders/simple_shader.frag.spv"};
+        GameDevice GameDevice{GameWindow};
+        GamePipeline GamePipeline{GameDevice,"shaders/simple_shader.vert.spv", "shaders/simple_shader.frag.spv", GamePipeline::defaultPipelineConfigInfo(WIDTH,HEIGHT)};
+
 
       };
 }

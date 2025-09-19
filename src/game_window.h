@@ -23,6 +23,9 @@ namespace GEngine {
         GameWindow &operator=(const GameWindow&) = delete;
 
         bool shouldClose() {return glfwWindowShouldClose(window);}
+
+        void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
+
       private:
 
         void initWindow();

@@ -4,6 +4,8 @@
 
 #include <game_window.h>
 
+#include <stdexcept>
+
 namespace GEngine{
 
     GameWindow::GameWindow(int w, int h, std::string name) : width(w), height(h), windowName(name) {
@@ -23,6 +25,11 @@ namespace GEngine{
       window = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);
       }
 
+  void GameWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR *surface) {
+        if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create window surface!");
+        }
+    }
 
 
 }
