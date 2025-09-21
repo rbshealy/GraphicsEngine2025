@@ -89,6 +89,7 @@ void GameDevice::createInstance() {
   createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
   createInfo.ppEnabledExtensionNames = extensions.data();
 
+  //add {} to debugcreateinfo
   VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
   if (enableValidationLayers) {
     createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -141,7 +142,7 @@ void GameDevice::createLogicalDevice() {
 
   float queuePriority = 1.0f;
   for (uint32_t queueFamily : uniqueQueueFamilies) {
-    VkDeviceQueueCreateInfo queueCreateInfo = {};
+    VkDeviceQueueCreateInfo queueCreateInfo{};
     queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
     queueCreateInfo.queueFamilyIndex = queueFamily;
     queueCreateInfo.queueCount = 1;
@@ -182,7 +183,7 @@ void GameDevice::createLogicalDevice() {
 void GameDevice::createCommandPool() {
   QueueFamilyIndices queueFamilyIndices = findPhysicalQueueFamilies();
 
-  VkCommandPoolCreateInfo poolInfo = {};
+  VkCommandPoolCreateInfo poolInfo{};
   poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
   poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily;
   poolInfo.flags =

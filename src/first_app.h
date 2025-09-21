@@ -7,6 +7,10 @@
 #include <game_window.h>
 #include <game_pipeline.h>
 #include <game_device.h>
+#include <game_swap_chain.h>
+
+#include <memory>
+#include <vector>
 
 namespace GEngine {
 
@@ -16,13 +20,25 @@ namespace GEngine {
       static constexpr int WIDTH = 800;
       static constexpr int HEIGHT = 600;
 
+      FirstApp();
+      ~FirstApp();
       void run();
+
+      FirstApp(const FirstApp&) = delete;
+      FirstApp& operator=(const FirstApp&) = delete;
+
       private:
+        void createPipelineLayout();
+        void createPipeline();
+        void createCommandBuffers();
+        void drawFrame();
+
         GameWindow GameWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
         GameDevice GameDevice{GameWindow};
-        GamePipeline GamePipeline{GameDevice,"shaders/simple_shader.vert.spv", "shaders/simple_shader.frag.spv", GamePipeline::defaultPipelineConfigInfo(WIDTH,HEIGHT)};
-
-
+        GameSwapChain GameSwapChain{GameDevice, GameWindow.getExtent()};
+        std::unique_ptr<GamePipeline> GamePipeline;
+        VkPipelineLayout pipelineLayout;
+        std::vector<VkCommandBuffer> commandBuffers;
       };
 }
 

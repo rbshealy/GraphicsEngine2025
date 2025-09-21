@@ -12,8 +12,12 @@
 namespace GEngine {
 
     struct PipelineConfigInfo {
+        PipelineConfigInfo(const PipelineConfigInfo&) = delete;
+        PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
+        PipelineConfigInfo() = default;
         VkViewport viewport;
         VkRect2D scissor;
+        VkPipelineViewportStateCreateInfo viewportInfo;
         VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
         VkPipelineRasterizationStateCreateInfo rasterizationInfo;
         VkPipelineMultisampleStateCreateInfo multisampleInfo;
@@ -33,7 +37,9 @@ namespace GEngine {
             GamePipeline(const GamePipeline&) = delete;
             void operator=(const GamePipeline&) = delete;
 
-            static PipelineConfigInfo defaultPipelineConfigInfo(uint32_t width, uint32_t height);
+            void bind(VkCommandBuffer commandBuffer);
+            static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo, uint32_t width, uint32_t height);
+
 
         private:
             static std::vector<char> readFile(const std::string& filepath);

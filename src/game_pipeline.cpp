@@ -13,6 +13,10 @@
 
 namespace GEngine{
 
+	void GamePipeline::bind(VkCommandBuffer commandBuffer){
+          vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+	}
+
     GamePipeline::GamePipeline(class GEngine::GameDevice &device, const std::string& vertfilepath, const std::string& fragfilepath, const PipelineConfigInfo& configInfo) : GameDevice{device}{
       	createGraphicsPipeline(vertfilepath, fragfilepath, configInfo);
       }
@@ -42,8 +46,8 @@ namespace GEngine{
 
     void GamePipeline::createGraphicsPipeline(const std::string& vertfilepath, const std::string& fragfilepath,  const PipelineConfigInfo& configInfo){
 
-      //assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "Cannot create graphics pipeline: no pipelineLayout provided in configInfo");
-      //assert(configInfo.renderPass != VK_NULL_HANDLE && "Cannot create graphics pipeline: no renderPass provided in configInfo");
+      assert(configInfo.pipelineLayout != VK_NULL_HANDLE && "Cannot create graphics pipeline: no pipelineLayout provided in configInfo");
+      assert(configInfo.renderPass != VK_NULL_HANDLE && "Cannot create graphics pipeline: no renderPass provided in configInfo");
 
       auto vertCode = readFile(vertfilepath);
       auto fragCode = readFile(fragfilepath);
@@ -58,6 +62,7 @@ namespace GEngine{
       shaderStages[0].pName = "main";
       shaderStages[0].flags = 0;
       shaderStages[0].pNext = nullptr;
+      shaderStages[0].pSpecializationInfo = nullptr;
       shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
       shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
       shaderStages[1].module = fragShaderModule;
@@ -68,17 +73,10 @@ namespace GEngine{
 
       VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
       vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-      vertexInputInfo.vertexBindingDescriptionCount = 0;
       vertexInputInfo.vertexAttributeDescriptionCount = 0;
-      vertexInputInfo.pVertexBindingDescriptions = nullptr;
+      vertexInputInfo.vertexBindingDescriptionCount = 0;
       vertexInputInfo.pVertexAttributeDescriptions = nullptr;
-
-      VkPipelineViewportStateCreateInfo viewportInfo{};
-      viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-  	  viewportInfo.viewportCount = 1;
-  	  viewportInfo.pViewports = &configInfo.viewport;
-  	  viewportInfo.scissorCount = 1;
-  	  viewportInfo.pScissors = &configInfo.scissor;
+      vertexInputInfo.pVertexBindingDescriptions = nullptr;
 
       VkGraphicsPipelineCreateInfo pipelineInfo{};
       pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -86,7 +84,7 @@ namespace GEngine{
       pipelineInfo.pStages = shaderStages;
       pipelineInfo.pVertexInputState = &vertexInputInfo;
       pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
-      pipelineInfo.pViewportState = &viewportInfo;
+      pipelineInfo.pViewportState = &configInfo.viewportInfo;
       pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
       pipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
       pipelineInfo.pDepthStencilState = &configInfo.depthStencilInfo;
@@ -104,7 +102,7 @@ namespace GEngine{
         throw std::runtime_error("failed to create graphics pipeline");
       }
 
-      }
+    }
 
     void GamePipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule){
       VkShaderModuleCreateInfo createInfo{};
@@ -118,9 +116,7 @@ namespace GEngine{
     }
 
 
-    PipelineConfigInfo GamePipeline::defaultPipelineConfigInfo(uint32_t width, uint32_t height){
-      PipelineConfigInfo configInfo{};
-
+    void GamePipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo, uint32_t width, uint32_t height){
 
 		configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -135,6 +131,12 @@ namespace GEngine{
 
   		configInfo.scissor.offset = {0, 0};
   		configInfo.scissor.extent = {width, height};
+
+    	configInfo.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    	configInfo.viewportInfo.viewportCount = 1;
+    	configInfo.viewportInfo.pViewports = &configInfo.viewport;
+    	configInfo.viewportInfo.scissorCount = 1;
+    	configInfo.viewportInfo.pScissors = &configInfo.scissor;
 
   		configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
   		configInfo.rasterizationInfo.depthClampEnable = VK_FALSE;
@@ -188,7 +190,6 @@ namespace GEngine{
   		configInfo.depthStencilInfo.front = {};  // Optional
   		configInfo.depthStencilInfo.back = {};   // Optional
 
-      return configInfo;
     }
 
 }
