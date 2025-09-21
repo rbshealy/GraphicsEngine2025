@@ -10,6 +10,7 @@
 namespace GEngine{
 
     FirstApp::FirstApp() {
+        loadModels();
         createPipelineLayout();
         createPipeline();
         createCommandBuffers();
@@ -17,6 +18,16 @@ namespace GEngine{
 
     FirstApp::~FirstApp() {
         vkDestroyPipelineLayout(GameDevice.device(), pipelineLayout, nullptr);
+    }
+
+    void FirstApp::loadModels() {
+        std::vector<GameModel::Vertex> vertices {
+            {{0.0f,-0.5f}},
+            {{0.5f, 0.5f}},
+            {{-0.5f, 0.5f}},
+        };
+
+        GameModel = std::make_unique<class GameModel>(GameDevice,vertices);
     }
 
 
@@ -91,7 +102,8 @@ namespace GEngine{
             vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
             GamePipeline->bind(commandBuffers[i]);
-            vkCmdDraw(commandBuffers[i],3,1,0,0);
+            GameModel->bind(commandBuffers[i]);
+            GameModel->draw(commandBuffers[i]);
             vkCmdEndRenderPass(commandBuffers[i]);
             if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
                 throw std::runtime_error("failed to record command buffer");

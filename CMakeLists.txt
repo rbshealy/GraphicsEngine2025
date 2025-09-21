@@ -19,9 +19,9 @@ message(STATUS "Found glslc: ${GLSLC_EXECUTABLE}")
 
 set(SHADER_DIR ${CMAKE_SOURCE_DIR}/shaders)
 
-set(SHADERS
-        ${SHADER_DIR}/simple_shader.vert
-        ${SHADER_DIR}/simple_shader.frag
+file(GLOB SHADERS
+        ${SHADER_DIR}/*.vert
+        ${SHADER_DIR}/*.frag
 )
 
 set(SPIRV_OUTPUT_DIR ${CMAKE_BINARY_DIR}/shaders)
@@ -32,6 +32,7 @@ foreach(SHADER ${SHADERS})
 
     add_custom_command(
             OUTPUT ${SPIRV_FILE}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${SPIRV_OUTPUT_DIR}
             COMMAND ${GLSLC_EXECUTABLE} ${SHADER} -o ${SPIRV_FILE}
             DEPENDS ${SHADER}
             COMMENT "Compiling shader ${FILE_NAME} -> ${SPIRV_FILE}"

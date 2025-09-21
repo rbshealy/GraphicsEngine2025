@@ -8,6 +8,7 @@
 #include <game_pipeline.h>
 #include <game_device.h>
 #include <game_swap_chain.h>
+#include <game_model.h>
 
 #include <memory>
 #include <vector>
@@ -22,12 +23,15 @@ namespace GEngine {
 
       FirstApp();
       ~FirstApp();
-      void run();
+
 
       FirstApp(const FirstApp&) = delete;
       FirstApp& operator=(const FirstApp&) = delete;
 
+        void run();
+
       private:
+        void loadModels();
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
@@ -39,6 +43,7 @@ namespace GEngine {
         std::unique_ptr<GamePipeline> GamePipeline;
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;
+        std::unique_ptr<GameModel> GameModel;
       };
 }
 
