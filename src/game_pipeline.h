@@ -35,7 +35,7 @@ namespace GEngine {
             ~GamePipeline();
 
             GamePipeline(const GamePipeline&) = delete;
-            void operator=(const GamePipeline&) = delete;
+            GamePipeline& operator=(const GamePipeline&) = delete;
 
             void bind(VkCommandBuffer commandBuffer);
             static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo, uint32_t width, uint32_t height);

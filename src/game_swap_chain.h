@@ -19,7 +19,7 @@ class GameSwapChain {
   ~GameSwapChain();
 
   GameSwapChain(const GameSwapChain &) = delete;
-  void operator=(const GameSwapChain &) = delete;
+  GameSwapChain& operator=(const GameSwapChain &) = delete;
 
   VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
   VkRenderPass getRenderPass() { return renderPass; }

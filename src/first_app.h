@@ -36,10 +36,12 @@ namespace GEngine {
         void createPipeline();
         void createCommandBuffers();
         void drawFrame();
+        void recreateSwapChain();
+        void recordCommandBuffer(int imageIndex);
 
         GameWindow GameWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
         GameDevice GameDevice{GameWindow};
-        GameSwapChain GameSwapChain{GameDevice, GameWindow.getExtent()};
+        std::unique_ptr<GameSwapChain> GameSwapChain;
         std::unique_ptr<GamePipeline> GamePipeline;
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;
