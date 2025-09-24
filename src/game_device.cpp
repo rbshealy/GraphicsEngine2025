@@ -8,6 +8,8 @@
 
 namespace GEngine {
 
+const int NVIDIA_VENDOR_ID = 0x10DE;
+
 // local callback functions
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -120,7 +122,9 @@ void GameDevice::pickPhysicalDevice() {
   vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
   for (const auto &device : devices) {
-    if (isDeviceSuitable(device)) {
+    VkPhysicalDeviceProperties deviceProperties;
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+    if (isDeviceSuitable(device) && deviceProperties.vendorID == NVIDIA_VENDOR_ID) {
       physicalDevice = device;
       break;
     }

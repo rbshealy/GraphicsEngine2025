@@ -73,6 +73,7 @@ namespace GEngine{
         }
 
         vkDeviceWaitIdle(GameDevice.device());
+        GameSwapChain = nullptr;
         GameSwapChain = std::make_unique<class GameSwapChain>(GameDevice, extent);
         createPipeline();
     }
@@ -129,6 +130,11 @@ namespace GEngine{
         uint32_t imageIndex = 0;
         auto result = GameSwapChain->acquireNextImage(&imageIndex);
 
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {   // out of date (not out of memory!)
+            recreateSwapChain();
+            return;
+        }
+
         if (result == VK_ERROR_OUT_OF_DEVICE_MEMORY) {
             recreateSwapChain();
             return;
@@ -137,6 +143,7 @@ namespace GEngine{
             throw std::runtime_error("failed to acquire next image");
         }
 
+        vkResetCommandBuffer(commandBuffers[imageIndex], 0);
         recordCommandBuffer(imageIndex);
         result = GameSwapChain->submitCommandBuffers(&commandBuffers[imageIndex],&imageIndex);
         if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || GameWindow.wasWindowResized()) {
