@@ -7,6 +7,7 @@
 #include <game_window.h>
 #include <game_pipeline.h>
 #include <game_device.h>
+#include <game_object.h>
 #include <game_swap_chain.h>
 #include <game_model.h>
 
@@ -31,21 +32,22 @@ namespace GEngine {
         void run();
 
       private:
-        void loadModels();
+        void loadGameObjects();
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
         void drawFrame();
         void recreateSwapChain();
         void recordCommandBuffer(int imageIndex);
+        void renderGameObjects(VkCommandBuffer commandBuffer);
 
-        GameWindow GameWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
-        GameDevice GameDevice{GameWindow};
-        std::unique_ptr<GameSwapChain> GameSwapChain;
-        std::unique_ptr<GamePipeline> GamePipeline;
+        GameWindow gameWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
+        GameDevice gameDevice{gameWindow};
+        std::unique_ptr<GameSwapChain> gameSwapChain;
+        std::unique_ptr<GamePipeline> gamePipeline;
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;
-        std::unique_ptr<GameModel> GameModel;
+        std::vector<GameObject> gameObjects;
       };
 }
 
