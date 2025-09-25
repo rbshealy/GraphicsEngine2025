@@ -8,6 +8,7 @@
 // std lib headers
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace GEngine {
 
@@ -16,7 +17,10 @@ class GameSwapChain {
   static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
   GameSwapChain(GameDevice &deviceRef, VkExtent2D windowExtent);
+  GameSwapChain(GameDevice &deviceRef, VkExtent2D windowExtent, std::shared_ptr<GameSwapChain> previous);
   ~GameSwapChain();
+
+   void init();
 
   GameSwapChain(const GameSwapChain &) = delete;
   GameSwapChain& operator=(const GameSwapChain &) = delete;
@@ -38,6 +42,11 @@ class GameSwapChain {
   VkResult acquireNextImage(uint32_t *imageIndex);
   VkResult submitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
 
+  bool compareSwapFormats(const GameSwapChain &swapChain) const {
+       return swapChain.swapChainDepthFormat == swapChainDepthFormat &&
+                swapChain.swapChainImageFormat == swapChainImageFormat;
+  }
+
  private:
   void createSwapChain();
   void createImageViews();
@@ -54,6 +63,7 @@ class GameSwapChain {
   VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
 
   VkFormat swapChainImageFormat;
+  VkFormat swapChainDepthFormat;
   VkExtent2D swapChainExtent;
 
   std::vector<VkFramebuffer> swapChainFramebuffers;
@@ -69,6 +79,7 @@ class GameSwapChain {
   VkExtent2D windowExtent;
 
   VkSwapchainKHR swapChain;
+    std::shared_ptr<GameSwapChain> oldSwapChain;
 
   std::vector<VkSemaphore> imageAvailableSemaphores;
   std::vector<VkSemaphore> renderFinishedSemaphores;
@@ -77,4 +88,4 @@ class GameSwapChain {
   size_t currentFrame = 0;
 };
 
-}  // namespace lve
+}  // namespace Game

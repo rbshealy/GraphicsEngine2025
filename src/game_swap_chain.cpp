@@ -11,8 +11,17 @@
 
 namespace GEngine {
 
-GameSwapChain::GameSwapChain(GEngine::GameDevice &deviceRef, VkExtent2D extent)
-    : device{deviceRef}, windowExtent{extent} {
+GameSwapChain::GameSwapChain(GameDevice &deviceRef, VkExtent2D windowExtent)
+    : device{deviceRef}, windowExtent{windowExtent} {
+  init();
+}
+
+GameSwapChain::GameSwapChain(GameDevice &deviceRef, VkExtent2D windowExtent, std::shared_ptr<GameSwapChain> previous) : device{deviceRef}, windowExtent{windowExtent}, oldSwapChain{previous} {
+  init();
+  oldSwapChain = nullptr;
+}
+
+  void GameSwapChain::init() {
   createSwapChain();
   createImageViews();
   createRenderPass();
@@ -298,6 +307,7 @@ void GameSwapChain::createFramebuffers() {
 
 void GameSwapChain::createDepthResources() {
   VkFormat depthFormat = findDepthFormat();
+  swapChainDepthFormat = depthFormat;
   VkExtent2D swapChainExtent = getSwapChainExtent();
 
   depthImages.resize(imageCount());
