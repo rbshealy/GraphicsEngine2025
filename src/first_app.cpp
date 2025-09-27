@@ -4,6 +4,7 @@
 
 #include "first_app.h"
 #include "simple_render_system.h"
+#include <game_camera.h>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -23,59 +24,91 @@ namespace GEngine{
     FirstApp::~FirstApp() {
     }
 
+    // temporary helper function, creates a 1x1x1 cube centered at offset
+std::unique_ptr<GameModel> createCubeModel(GameDevice& device, glm::vec3 offset) {
+  std::vector<GameModel::Vertex> vertices{
+
+      // left face (white)
+      {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+      {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+      {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
+      {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+      {{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
+      {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+
+      // right face (yellow)
+      {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+      {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+      {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
+      {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+      {{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
+      {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+
+      // top face (orange, remember y axis points down)
+      {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+      {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+      {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+      {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+      {{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+      {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+
+      // bottom face (red)
+      {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+      {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+      {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
+      {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+      {{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+      {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+
+      // nose face (blue)
+      {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+      {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+      {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+      {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+      {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+      {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+
+      // tail face (green)
+      {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+      {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+      {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+      {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+      {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+      {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+
+  };
+  for (auto& v : vertices) {
+    v.position += offset;
+  }
+  return std::make_unique<GameModel>(device, vertices);
+}
+
     void FirstApp::loadGameObjects() {
-        std::vector<GameModel::Vertex> vertices {
-            {{-0.5f,-0.5f},{1.0f,0.0f,0.0f}},
-            {{-0.5f, 0.5f}, {0.00f,1.0f,0.0f}},
-            {{0.5f, 0.5f}, {0.00f,0.0f,1.0f}},
-        };
+        std::shared_ptr<GameModel> gameModel = createCubeModel(gameDevice, {.0f,.0f,.0f} );
 
-        auto GameModel = std::make_shared<class GameModel>(gameDevice,vertices);
+        auto cube = GameObject::createGameObject();
+        cube.model = gameModel;
+        cube.transform.translation = {.0f, .0f, 2.5f};
+        cube.transform.scale = {.5f, .5f, .5f};
 
-        //auto triangle = GameObject::createGameObject();
-        //triangle.model = GameModel;
-        //triangle.color = {0.1f, 0.8f, 0.1f};
-        //triangle.transform2d.translation.x = .2f;
-        //triangle.transform2d.scale = {2.f, .5f};
-        //triangle.transform2d.rotation = .25f * glm::two_pi<float>();
+        gameObjects.push_back(std::move(cube));
 
-        //gameObjects.push_back(std::move(triangle));
-
-        //https://coolors.co/palette/461220-8c2f39-b23a48-fcb9b2-fed0bb
-        std::vector<glm::vec3> colors{
-          {70.f, 18.f, 32.f},
-          {140.f, 47.f, 57.f},
-          {178.f, 58.f, 72.f},
-          {252.f, 185.f, 178.f},
-          {254.f, 208.f, 187.f}  //
-        };
-
-        for (auto &col : colors) {
-            col = col / 255.f;
-        }
-
-        for (auto& color : colors) {
-            color = glm::pow(color, glm::vec3{2.2f});
-        }
-        for (int i = 0; i < 40; i++) {
-            auto triangle = GameObject::createGameObject();
-            triangle.model = GameModel;
-            triangle.transform2d.scale = glm::vec2(.5f) + i * 0.025f;
-            triangle.transform2d.rotation = i * glm::pi<float>() * .025f;
-            triangle.color = colors[i % colors.size()];
-            gameObjects.push_back(std::move(triangle));
-        }
     }
 
 
     void FirstApp::run() {
             SimpleRenderSystem simpleRenderSystem{gameDevice, gameRenderer.getSwapChainRenderPass()};
+            GameCamera camera{};
+
 
           while (!gameWindow.shouldClose()){
             glfwPollEvents();
+            float aspect = gameRenderer.getAspectRatio();
+            //camera.setOrthographicProjection(-aspect,aspect,-1,1,-1,1);
+            camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
                 if (auto commandBuffer = gameRenderer.beginFrame()) {
                     gameRenderer.beginSwapChainRenderPass(commandBuffer);
-                    simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects);
+                    simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
                     gameRenderer.endSwapChainRenderPass(commandBuffer);
                     gameRenderer.endFrame();
                 }

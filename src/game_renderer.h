@@ -26,6 +26,7 @@ namespace GEngine {
         GameRenderer& operator=(const GameRenderer&) = delete;
 
         VkRenderPass getSwapChainRenderPass() const {return gameSwapChain->getRenderPass();}
+        float getAspectRatio() const {return gameSwapChain->extentAspectRatio();}
         bool isFrameInProgress() const {return isFrameStarted;}
 
         VkCommandBuffer getCurrentCommandBuffer() const {

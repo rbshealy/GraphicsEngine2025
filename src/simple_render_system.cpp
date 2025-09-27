@@ -16,8 +16,7 @@
 namespace GEngine{
 
     struct SimplePushConstantData {
-        glm::mat2 transform{1.0f};
-        glm::vec2 offset;
+        glm::mat4 transform{1.0f};
         alignas(16) glm::vec3 color;
     };
 
@@ -64,23 +63,16 @@ namespace GEngine{
             pipelineConfig);
     }
 
-    void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject> &gameObjects) {
+    void SimpleRenderSystem::renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject> &gameObjects, const GameCamera &camera) {
         gamePipeline->bind(commandBuffer);
 
-        int i = 0;
-        for (auto& obj : gameObjects) {
-            i += 1;
-            obj.transform2d.rotation =
-                glm::mod<float>(obj.transform2d.rotation + 0.0003f * i, 2.f * glm::pi<float>());
-        }
-
         for (auto& obj: gameObjects) {
-            //obj.transform2d.rotation = glm::mod(obj.transform2d.rotation + 0.005f, glm::two_pi<float>());
+            obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.005f, glm::two_pi<float>());
+            obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.0025f, glm::two_pi<float>());
 
             SimplePushConstantData push{};
-            push.offset = obj.transform2d.translation;
             push.color = obj.color;
-            push.transform = obj.transform2d.mat2();
+            push.transform = camera.getProjection() * obj.transform.mat4();
 
             vkCmdPushConstants(
                 commandBuffer,

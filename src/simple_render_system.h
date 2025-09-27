@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "game_camera.h"
 #include <game_pipeline.h>
 #include <game_device.h>
 #include <game_object.h>
@@ -24,7 +25,9 @@ namespace GEngine {
         SimpleRenderSystem(const SimpleRenderSystem&) = delete;
         SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
 
-        void renderGameObjects(VkCommandBuffer commandBuffer, std::vector<GameObject> &gameObjects);
+        void renderGameObjects(VkCommandBuffer commandBuffer,
+            std::vector<GameObject> &gameObjects,
+            const GameCamera &camera);
 
     private:
         void createPipelineLayout();
